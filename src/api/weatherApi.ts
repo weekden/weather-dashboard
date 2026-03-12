@@ -1,3 +1,4 @@
+import { degreesToWindDirection } from '../helpers/degreesToWindDirection';
 import type { WeatherData } from '../types/weather';
 
 const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY as string;
@@ -16,6 +17,7 @@ export async function fetchCurrentWeather(_city: string): Promise<WeatherData> {
   }
 
   const data = await response.json();
+  console.log(data);
 
   return {
     city: data.name,
@@ -24,5 +26,6 @@ export async function fetchCurrentWeather(_city: string): Promise<WeatherData> {
     icon: data.weather[0].icon,
     humidity: data.main.humidity,
     wind: Math.round(data.wind.speed * 10) / 10,
+    windDerection: degreesToWindDirection(data.wind.deg),
   };
 }
