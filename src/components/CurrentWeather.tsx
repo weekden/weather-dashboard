@@ -10,7 +10,7 @@ export function CurrentWeather({ data }: CurrentWeatherProps): React.JSX.Element
   const iconUrl = `https://openweathermap.org/img/wn/${data.icon}@2x.png`;
 
   return (
-    <div className="w-full max-w-sm mx-auto rounded-2xl bg-white/10 backdrop-blur-sm shadow-xl p-6 text-white">
+    <div className="w-full rounded-2xl bg-white/10 backdrop-blur-sm shadow-xl p-6 text-white">
       {/* City name */}
       <h2 className="text-lg font-medium text-white/80 mb-4">{data.city}</h2>
 
