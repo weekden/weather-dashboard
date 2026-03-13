@@ -31,6 +31,28 @@ Return type must be `React.JSX.Element` (not `JSX.Element` — global JSX namesp
 - `@typescript-eslint/no-explicit-any` — no `any`
 - `simple-import-sort/imports` + `simple-import-sort/exports` — imports must be sorted
 
+## Environment
+
+Requires a `.env` file at the project root:
+
+```
+VITE_OPENWEATHER_API_KEY=<your_key>
+```
+
+See `.env.example` for reference. The key is read in `src/api/weatherApi.ts` via `import.meta.env.VITE_OPENWEATHER_API_KEY`.
+
+## Architecture
+
+Data flows in one direction: `api/` → `types/` ← `components/`
+
+- **`src/api/weatherApi.ts`** — fetches from OpenWeatherMap `/data/2.5/weather`, maps the raw JSON to `WeatherData`, throws typed errors on 404 and other failures.
+- **`src/types/weather.ts`** — single `WeatherData` interface shared by the API layer and all components.
+- **`src/helpers/`** — pure transformation functions (e.g. `degreesToWindDirection`).
+- **`src/components/`** — presentational components that receive typed props; no data fetching.
+- **`src/App.tsx`** — root component; owns state, drives data fetching, composes components.
+
+Styling uses **Tailwind CSS v4** (configured via `@tailwindcss/vite` Vite plugin — no `tailwind.config.*` file needed).
+
 ## Commits
 
 Conventional commits are enforced via commitlint. Format: `type(scope): message`
