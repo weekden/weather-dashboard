@@ -2,20 +2,26 @@ import './App.css';
 
 import React, { useEffect, useState } from 'react';
 
-import { fetchCurrentWeather, fetchWeatherByCoords } from './api/weatherApi';
+import {
+  fetchCurrentWeather,
+  fetchForecast,
+  fetchForecastByCoords,
+  fetchWeatherByCoords,
+} from './api/weatherApi';
 import { CurrentWeather } from './components/CurrentWeather';
 import { ErrorMessage } from './components/ErrorMessage';
 import { SearchBar } from './components/SearchBar';
 import { SearchHistorySidebar } from './components/SearchHistorySidebar';
 import { getCurrentPosition } from './helpers/getCurrentPosition';
 import { useSearchHistory } from './hooks/useSearchHistory';
-import type { WeatherData } from './types/weather';
+import type { ForecastDay, WeatherData } from './types/weather';
 
 const FALLBACK_CITY = 'London';
 
 function App(): React.JSX.Element {
   const [isCurrentLocation, setIsCurrentLocation] = useState<boolean>(false);
   const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [, setForecast] = useState<ForecastDay[] | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,13 +32,23 @@ function App(): React.JSX.Element {
     async function loadWeather(): Promise<void> {
       try {
         const coords = await getCurrentPosition();
-        const data = await fetchWeatherByCoords(coords.latitude, coords.longitude);
-        setWeather(data);
+        const [weatherData, forecastData] = await Promise.all([
+          fetchWeatherByCoords(coords.latitude, coords.longitude),
+          fetchForecastByCoords(coords.latitude, coords.longitude),
+        ]);
+        setWeather(weatherData);
+        setForecast(forecastData);
+        console.log('5-Day Forecast:', forecastData);
         setIsCurrentLocation(true);
       } catch {
         try {
-          const data = await fetchCurrentWeather(FALLBACK_CITY);
-          setWeather(data);
+          const [weatherData, forecastData] = await Promise.all([
+            fetchCurrentWeather(FALLBACK_CITY),
+            fetchForecast(FALLBACK_CITY),
+          ]);
+          setWeather(weatherData);
+          setForecast(forecastData);
+          console.log('5-Day Forecast:', forecastData);
         } catch {
           setError('Unable to load weather data. Please try again later.');
         }
@@ -48,9 +64,14 @@ function App(): React.JSX.Element {
     setIsSearchLoading(true);
     setError(null);
     try {
-      const data = await fetchCurrentWeather(city);
-      setWeather(data);
-      addCity(data.city);
+      const [weatherData, forecastData] = await Promise.all([
+        fetchCurrentWeather(city),
+        fetchForecast(city),
+      ]);
+      setWeather(weatherData);
+      setForecast(forecastData);
+      console.log('5-Day Forecast:', forecastData);
+      addCity(weatherData.city);
       setIsSidebarOpen(false);
       setIsCurrentLocation(false);
     } catch (err) {
