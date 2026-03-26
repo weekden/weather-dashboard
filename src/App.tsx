@@ -10,6 +10,7 @@ import {
 } from './api/weatherApi';
 import { CurrentWeather } from './components/CurrentWeather';
 import { ErrorMessage } from './components/ErrorMessage';
+import { ForecastSection } from './components/ForecastSection';
 import { SearchBar } from './components/SearchBar';
 import { SearchHistorySidebar } from './components/SearchHistorySidebar';
 import { getCurrentPosition } from './helpers/getCurrentPosition';
@@ -21,7 +22,7 @@ const FALLBACK_CITY = 'London';
 function App(): React.JSX.Element {
   const [isCurrentLocation, setIsCurrentLocation] = useState<boolean>(false);
   const [weather, setWeather] = useState<WeatherData | null>(null);
-  const [, setForecast] = useState<ForecastDay[] | null>(null);
+  const [forecast, setForecast] = useState<ForecastDay[] | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -68,7 +69,6 @@ function App(): React.JSX.Element {
       ]);
       setWeather(weatherData);
       setForecast(forecastData);
-      console.log('5-Day Forecast:', forecastData);
       addCity(weatherData.city);
       setIsSidebarOpen(false);
       setIsCurrentLocation(false);
@@ -144,6 +144,7 @@ function App(): React.JSX.Element {
           {!isLoading && weather !== null && (
             <CurrentWeather data={weather} isCurrentLocation={isCurrentLocation} />
           )}
+          {!isLoading && forecast !== null && <ForecastSection forecast={forecast} />}
         </div>
       </div>
     </div>
