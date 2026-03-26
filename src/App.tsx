@@ -14,6 +14,7 @@ import type { WeatherData } from './types/weather';
 const FALLBACK_CITY = 'London';
 
 function App(): React.JSX.Element {
+  const [isCurrentLocation, setIsCurrentLocation] = useState<boolean>(false);
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false);
@@ -27,6 +28,7 @@ function App(): React.JSX.Element {
         const coords = await getCurrentPosition();
         const data = await fetchWeatherByCoords(coords.latitude, coords.longitude);
         setWeather(data);
+        setIsCurrentLocation(true);
       } catch {
         try {
           const data = await fetchCurrentWeather(FALLBACK_CITY);
@@ -50,6 +52,7 @@ function App(): React.JSX.Element {
       setWeather(data);
       addCity(data.city);
       setIsSidebarOpen(false);
+      setIsCurrentLocation(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to load weather data.');
     } finally {
@@ -119,7 +122,9 @@ function App(): React.JSX.Element {
             <p className="text-white/80 text-sm">Loading weather data...</p>
           )}
           {!isLoading && !isSearchLoading && error !== null && <ErrorMessage message={error} />}
-          {!isLoading && weather !== null && <CurrentWeather data={weather} />}
+          {!isLoading && weather !== null && (
+            <CurrentWeather data={weather} isCurrentLocation={isCurrentLocation} />
+          )}
         </div>
       </div>
     </div>
