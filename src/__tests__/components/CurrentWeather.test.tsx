@@ -5,11 +5,16 @@ import { mockWeatherData } from '../__mocks__/weatherData';
 
 describe('CurrentWeather', () => {
   beforeEach(() => {
-    render(<CurrentWeather data={mockWeatherData} />);
+    render(<CurrentWeather data={mockWeatherData} isCurrentLocation={false} />);
   });
 
   it('displays city name', () => {
     expect(screen.getByText('London')).toBeDefined();
+  });
+
+  it('displays "Current Location" label when isCurrentLocation is true', () => {
+    render(<CurrentWeather data={mockWeatherData} isCurrentLocation={true} />);
+    expect(screen.getByText('Current Location')).toBeDefined();
   });
 
   it('displays temperature with °C suffix', () => {
