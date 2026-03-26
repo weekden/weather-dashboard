@@ -38,7 +38,6 @@ function App(): React.JSX.Element {
         ]);
         setWeather(weatherData);
         setForecast(forecastData);
-        console.log('5-Day Forecast:', forecastData);
         setIsCurrentLocation(true);
       } catch {
         try {
@@ -48,7 +47,6 @@ function App(): React.JSX.Element {
           ]);
           setWeather(weatherData);
           setForecast(forecastData);
-          console.log('5-Day Forecast:', forecastData);
         } catch {
           setError('Unable to load weather data. Please try again later.');
         }

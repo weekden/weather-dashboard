@@ -1,4 +1,4 @@
-import type { WeatherData } from '../../types/weather';
+import type { ForecastDay, WeatherData } from '../../types/weather';
 
 export const mockWeatherData: WeatherData = {
   city: 'London',
@@ -8,4 +8,12 @@ export const mockWeatherData: WeatherData = {
   humidity: 82,
   wind: 5.4,
   windDerection: 'SW ↙',
+};
+
+export const mockForecastDay: ForecastDay = {
+  date: 'Tue 26 Mar',
+  icon: '01d',
+  tempHigh: 20,
+  tempLow: 12,
+  humidity: 73,
 };
