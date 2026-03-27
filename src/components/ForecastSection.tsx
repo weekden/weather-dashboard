@@ -13,7 +13,7 @@ export function ForecastSection({ forecast }: ForecastSectionProps): React.JSX.E
       <h3 className="text-white/80 text-xs font-semibold uppercase tracking-widest mb-4">
         5-Day Forecast
       </h3>
-      <div className="grid grid-cols-5 gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-5 gap-2">
         {forecast.map((day) => (
           <ForecastCard key={day.date} day={day} />
         ))}
