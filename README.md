@@ -1,73 +1,78 @@
-# React + TypeScript + Vite
+# Weather Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A responsive weather dashboard built with React and TypeScript that displays real-time weather data and a 5-day forecast for any city, with geolocation support and search history.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Current weather conditions — temperature, humidity, wind speed and direction, weather description
+- 5-day forecast grouped by day
+- Geolocation-based city detection on load (falls back to London)
+- City search with persistent history (last 10 searches stored in `localStorage`)
+- Fully responsive layout (mobile + desktop)
 
-## React Compiler
+## Main Target
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Practice building a real-world React + TypeScript app with:
+- Strict TypeScript configuration
+- Clean component architecture (API layer → types ← components)
+- Custom hooks, pure helper functions, and tested code
+- Production-grade tooling: ESLint, Prettier, Husky, commitlint, Vitest
 
-## Expanding the ESLint configuration
+## Environment
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+| Tool | Version |
+|------|---------|
+| Node.js | 20+ (developed on v25) |
+| npm | 10+ |
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Getting Started
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+**1. Clone the repository**
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+git clone https://github.com/weekden/weather-dashboard.git
+cd weather-dashboard
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+**2. Install dependencies**
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
+
+**3. Set up environment variables**
+
+```bash
+cp .env.example .env
+```
+
+Open `.env` and add your [OpenWeatherMap API key](https://openweathermap.org/api):
+
+```
+VITE_OPENWEATHER_API_KEY=your_openweather_api_key_here
+```
+
+**4. Start the dev server**
+
+```bash
+npm run dev
+```
+
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server with HMR |
+| `npm run build` | Type-check and build for production |
+| `npm run preview` | Preview the production build locally |
+| `npm run lint` | Run ESLint with auto-fix |
+| `npm run format` | Format `src/**` with Prettier |
+| `npm test` | Run all tests |
+| `npm run test:coverage` | Run tests with coverage report |
+
+## Tech Stack
+
+- **React 19** + **TypeScript 5.9** + **Vite 7**
+- **Tailwind CSS v4** (via `@tailwindcss/vite` plugin)
+- **Vitest** + **@testing-library/react** for unit and component tests
+- **ESLint** (flat config) + **Prettier** + **Husky** + **commitlint**
