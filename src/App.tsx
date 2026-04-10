@@ -1,96 +1,40 @@
 import './App.css';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
-import {
-  fetchCurrentWeather,
-  fetchForecast,
-  fetchForecastByCoords,
-  fetchWeatherByCoords,
-} from './api/weatherApi';
 import { CurrentWeather } from './components/CurrentWeather';
 import { ErrorMessage } from './components/ErrorMessage';
 import { ForecastSection } from './components/ForecastSection';
 import { Header } from './components/Header';
 import { SearchBar } from './components/SearchBar';
 import { SearchHistorySidebar } from './components/SearchHistorySidebar';
-import { getCurrentPosition } from './helpers/getCurrentPosition';
 import { useSearchHistory } from './hooks/useSearchHistory';
-import type { ForecastDay, WeatherData } from './types/weather';
-
-const FALLBACK_CITY = 'London';
+import { useWeather } from './hooks/useWeather';
 
 function App(): React.JSX.Element {
-  const [isCurrentLocation, setIsCurrentLocation] = useState<boolean>(false);
-  const [weather, setWeather] = useState<WeatherData | null>(null);
-  const [forecast, setForecast] = useState<ForecastDay[] | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const { history, addCity, clearHistory } = useSearchHistory();
 
-  useEffect(() => {
-    async function loadWeather(): Promise<void> {
-      try {
-        const coords = await getCurrentPosition();
-        const [weatherData, forecastData] = await Promise.all([
-          fetchWeatherByCoords(coords.latitude, coords.longitude),
-          fetchForecastByCoords(coords.latitude, coords.longitude),
-        ]);
-        setWeather(weatherData);
-        setForecast(forecastData);
-        setIsCurrentLocation(true);
-      } catch {
-        try {
-          const [weatherData, forecastData] = await Promise.all([
-            fetchCurrentWeather(FALLBACK_CITY),
-            fetchForecast(FALLBACK_CITY),
-          ]);
-          setWeather(weatherData);
-          setForecast(forecastData);
-        } catch {
-          setError('Unable to load weather data. Please try again later.');
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    }
+  const { isCurrentLocation, weatherState, loadState, error, handleSearch } = useWeather(
+    useCallback(
+      (cityName: string): void => {
+        addCity(cityName);
+        setIsSidebarOpen(false);
+      },
+      [addCity]
+    )
+  );
 
-    loadWeather();
+  const toggleSidebar = useCallback((): void => {
+    setIsSidebarOpen((prev) => !prev);
   }, []);
 
-  async function handleCitySearch(city: string): Promise<void> {
-    setIsSearchLoading(true);
-    setError(null);
-    try {
-      const [weatherData, forecastData] = await Promise.all([
-        fetchCurrentWeather(city),
-        fetchForecast(city),
-      ]);
-      setWeather(weatherData);
-      setForecast(forecastData);
-      addCity(weatherData.city);
-      setIsSidebarOpen(false);
-      setIsCurrentLocation(false);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to load weather data.');
-    } finally {
-      setIsSearchLoading(false);
-    }
-  }
-
-  function toggleSidebar(): void {
-    setIsSidebarOpen((prev) => !prev);
-  }
-
-  function closeSidebar(): void {
+  const closeSidebar = useCallback((): void => {
     setIsSidebarOpen(false);
-  }
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-500 to-indigo-700 flex flex-col md:justify-center px-4 py-10 md:px-8">
-      {/* Mobile hamburger button */}
       <Header isSidebarOpen={isSidebarOpen} onToggleSidebar={toggleSidebar} />
 
       {/* Mobile overlay drawer */}
@@ -102,7 +46,7 @@ function App(): React.JSX.Element {
           >
             <SearchHistorySidebar
               history={history}
-              onSelect={handleCitySearch}
+              onSelect={handleSearch}
               onClear={clearHistory}
             />
           </div>
@@ -116,7 +60,7 @@ function App(): React.JSX.Element {
           <div className="h-full rounded-2xl bg-white/10 backdrop-blur-sm shadow-xl p-5">
             <SearchHistorySidebar
               history={history}
-              onSelect={handleCitySearch}
+              onSelect={handleSearch}
               onClear={clearHistory}
             />
           </div>
@@ -124,17 +68,21 @@ function App(): React.JSX.Element {
 
         {/* Main dashboard panel */}
         <div className="flex-1 flex flex-col items-center gap-4 w-full">
-          <SearchBar onSearch={handleCitySearch} isLoading={isSearchLoading} />
+          <SearchBar onSearch={handleSearch} isLoading={loadState === 'searching'} />
 
-          {isLoading && <p className="text-white/80 text-sm">Detecting your location...</p>}
-          {!isLoading && isSearchLoading && (
+          {loadState === 'init' && (
+            <p className="text-white/80 text-sm">Detecting your location...</p>
+          )}
+          {loadState === 'searching' && (
             <p className="text-white/80 text-sm">Loading weather data...</p>
           )}
-          {!isLoading && !isSearchLoading && error !== null && <ErrorMessage message={error} />}
-          {!isLoading && weather !== null && (
-            <CurrentWeather data={weather} isCurrentLocation={isCurrentLocation} />
+          {loadState === 'idle' && error !== null && <ErrorMessage message={error} />}
+          {loadState !== 'init' && weatherState !== null && (
+            <CurrentWeather data={weatherState.weather} isCurrentLocation={isCurrentLocation} />
           )}
-          {!isLoading && forecast !== null && <ForecastSection forecast={forecast} />}
+          {loadState !== 'init' && weatherState !== null && (
+            <ForecastSection forecast={weatherState.forecast} />
+          )}
         </div>
       </div>
     </div>
