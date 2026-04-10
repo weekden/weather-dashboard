@@ -95,10 +95,7 @@ function App(): React.JSX.Element {
 
       {/* Mobile overlay drawer */}
       {isSidebarOpen && (
-        <div
-          className="md:hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
-          onClick={closeSidebar}
-        >
+        <div className="md:hidden fixed inset-0 z-50 bg-black/40 " onClick={closeSidebar}>
           <div
             className="absolute top-0 left-0 h-full w-72 bg-gradient-to-b from-blue-600 to-indigo-800 p-6 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
